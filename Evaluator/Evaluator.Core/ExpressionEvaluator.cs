@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace Evaluator.Core;
+﻿namespace Evaluator.Core;
 
 public class ExpressionEvaluator
 {
@@ -48,7 +46,7 @@ public class ExpressionEvaluator
                         }
                         else
                         {
-                            postfix += stack.Pop();
+                            postfix += stack.Pop() + " ";
                             stack.Push(item);
                         }
                     }

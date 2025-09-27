@@ -120,7 +120,7 @@ namespace Evaluator.UI.Windows
 
         private void btnResult_Click(object sender, EventArgs e)
         {
-            txtDisplay.Text += $"= {ExpressionEvaluator.Evaluate(txtDisplay.Text)}";
+            txtDisplay.Text += $"={ExpressionEvaluator.Evaluate(txtDisplay.Text)}";
         }
     }
 }
