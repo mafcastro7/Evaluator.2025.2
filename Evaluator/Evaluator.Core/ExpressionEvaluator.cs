@@ -1,4 +1,6 @@
-﻿namespace Evaluator.Core;
+﻿using System.Data;
+
+namespace Evaluator.Core;
 
 public class ExpressionEvaluator
 {
@@ -12,16 +14,28 @@ public class ExpressionEvaluator
     {
         var stack = new Stack<char>();
         var postfix = string.Empty;
+        string number = string.Empty;
+
         foreach (char item in infix)
         {
-            if (IsOperator(item))
+            if (char.IsDigit(item) || item == '.')
             {
+                number += item;
+            }
+            else if (IsOperator(item))
+            {
+                if (!string.IsNullOrEmpty(number))
+                {
+                    postfix += number + " ";
+                    number = string.Empty;
+                }
+
                 if (item == ')')
                 {
-                    do
+                    while (stack.Peek() != '(')
                     {
-                        postfix += stack.Pop();
-                    } while (stack.Peek() != '(');
+                        postfix += stack.Pop() + " ";
+                    }
                     stack.Pop();
                 }
                 else
@@ -44,16 +58,20 @@ public class ExpressionEvaluator
                     }
                 }
             }
-            else
+            else if (!char.IsWhiteSpace(item))
             {
-                postfix += item;
+                throw new Exception($"Invalid character in expression: {item}");
             }
+        }
+        if (!string.IsNullOrEmpty(number))
+        {
+            postfix += number + " ";
         }
         while (stack.Count > 0)
         {
-            postfix += stack.Pop();
+            postfix += stack.Pop() + " ";
         }
-        return postfix;
+        return postfix.Trim();
     }
 
     private static bool IsOperator(char item) => item is '^' or '/' or '*' or '%' or '+' or '-' or '(' or ')';
@@ -79,17 +97,17 @@ public class ExpressionEvaluator
     private static double Calulate(string postfix)
     {
         var stack = new Stack<double>();
-        foreach (char item in postfix)
+        foreach (var token in postfix.Split(' ', StringSplitOptions.RemoveEmptyEntries))
         {
-            if (IsOperator(item))
+            if (token.Length == 1 && IsOperator(token[0]))
             {
                 var op2 = stack.Pop();
                 var op1 = stack.Pop();
-                stack.Push(Calulate(op1, item, op2));
+                stack.Push(Calulate(op1, token[0], op2));
             }
             else
             {
-                stack.Push(Convert.ToDouble(item.ToString()));
+                stack.Push(Convert.ToDouble(token));
             }
         }
         return stack.Peek();
